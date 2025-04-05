@@ -319,6 +319,14 @@ class _ClientPageState extends State<ClientPage> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args == 'logout' && currentUser != null) {
+      currentUser = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {}); // Refresh UI after logout
+      });
+    }
+
     return Scaffold(
       drawer: _buildSidebar(),
       appBar: AppBar(
