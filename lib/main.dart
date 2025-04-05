@@ -2,21 +2,31 @@ import 'package:flutter/material.dart';
 import 'screens/client.dart';
 
 void main() {
-  runApp(const ClassRideApp());
+  runApp(ClassRideApp());
 }
 
 class ClassRideApp extends StatelessWidget {
-  const ClassRideApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Class Ride App',
+      title: 'Class Ride',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        useMaterial3: true,
+        primaryColor: Color(0xFF121435),
+        scaffoldBackgroundColor: Color(0xFFFAF9F0),
+        fontFamily: 'Roboto',
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFFFF5722),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
       ),
-      home: const ClientPage(),
+      home: ClientPage(),
     );
   }
 }

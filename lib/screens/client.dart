@@ -1,503 +1,353 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'student_dashboard.dart';
+import 'driver_dashboard.dart';
+import 'owner_dashboard.dart';
 
 class ClientPage extends StatefulWidget {
-  const ClientPage({super.key});
-
   @override
-  State<ClientPage> createState() => _ClientPageState();
+  _ClientPageState createState() => _ClientPageState();
 }
 
 class _ClientPageState extends State<ClientPage> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-  Timer? _timer;
+  Map<String, dynamic>? currentUser;
+  bool isSignUp = false;
+  bool showChatConversation = false;
 
-  final List<String> slideTexts = [
-    "Welcome to ClassRide!",
-    "🎓 Are you a Student?\nFind a bus to take you to university.",
-    "🧑‍✈️ Are you a Driver?\nFind a bus owner and get employed.",
-    "🚌 Are you a Bus Owner?\nApply to manage your trips.",
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  String selectedRole = 'student';
+
+  final List<Map<String, dynamic>> conversation = [
+    {
+      'from': 'bot',
+      'text': 'Ohh! We found you a bus to drive.',
+      'button': 'Apply to this bus owner'
+    },
+    {
+      'from': 'bot',
+      'text': 'Ohh! We found you a bus to ride.',
+      'button': 'Apply now and join this bus owner'
+    },
   ];
 
-  List<Map<String, String>> fakeUsers = [];
-  Map<String, String>? currentUser;
+  void _showAuthDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setInnerState) {
+          return AlertDialog(
+            backgroundColor: Color(0xFFFAF9F0),
+            title: Text(isSignUp ? "Sign Up" : "Login", style: TextStyle(fontWeight: FontWeight.bold)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: selectedRole,
+                    decoration: InputDecoration(labelText: "Select Role"),
+                    items: ['student', 'driver', 'owner']
+                        .map((role) => DropdownMenuItem(value: role, child: Text(role.capitalize())))
+                        .toList(),
+                    onChanged: (value) => setInnerState(() => selectedRole = value!),
+                  ),
+                  TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(labelText: "Phone Number"),
+                  ),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: "Password"),
+                  ),
+                  if (isSignUp)
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(labelText: "Confirm Password"),
+                    ),
+                  SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (isSignUp &&
+                          _passwordController.text != _confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Passwords do not match")),
+                        );
+                        return;
+                      }
 
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  String selectedRole = 'Student';
-  final List<String> roles = ['Student', 'Driver', 'Owner'];
+                      Navigator.pop(context);
 
-  final Color darkBlue = const Color(0xFF121435);
-  final Color lightBackground = const Color(0xFFFAF9F0);
-  final Color beige = const Color(0xFFEDEBCA);
-  final Color orange = const Color(0xFFFF5722);
-
-  @override
-  void initState() {
-    super.initState();
-    _startAutoSlide();
-    _loadData();
-  }
-
-  void _startAutoSlide() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
-      int nextPage = _currentPage + 1;
-      if (nextPage >= slideTexts.length) {
-        nextPage = 0;
-      }
-      _pageController.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    });
-  }
-
-  Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final usersJson = prefs.getString('fake_users');
-    final userJson = prefs.getString('current_user');
-
-    if (usersJson != null) {
-      final List<dynamic> decoded = jsonDecode(usersJson);
-      fakeUsers = decoded.map((u) => Map<String, String>.from(u)).toList();
-    }
-
-    if (userJson != null) {
-      currentUser = Map<String, String>.from(jsonDecode(userJson));
-    }
-
-    setState(() {});
-  }
-
-  Future<void> _saveUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(fakeUsers);
-    await prefs.setString('fake_users', encoded);
-  }
-
-  Future<void> _saveCurrentUser(Map<String, String> user) async {
-    final prefs = await SharedPreferences.getInstance();
-    currentUser = user;
-    await prefs.setString('current_user', jsonEncode(user));
-    setState(() {});
-  }
-
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('current_user');
-    setState(() {
-      currentUser = null;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Logged out successfully')),
+                      Future.delayed(Duration(milliseconds: 100), () {
+                        setState(() {
+                          currentUser = {
+                            'phone': _phoneController.text,
+                            'role': selectedRole,
+                          };
+                        });
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFF5722)),
+                    child: Text(isSignUp ? "Sign Up" : "Login"),
+                  ),
+                  TextButton(
+                    onPressed: () => setInnerState(() => isSignUp = !isSignUp),
+                    child: Text(isSignUp ? "Already have an account? Login" : "Don't have an account? Sign Up"),
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    nameController.dispose();
-    _pageController.dispose();
-    _timer?.cancel();
-    super.dispose();
+  void _logout() {
+    setState(() {
+      currentUser = null;
+    });
   }
 
-  void _showAuthDialog(BuildContext context) {
-    bool isLogin = true;
+  void _showOwnerApplicationForm() {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+    final TextEditingController companyController = TextEditingController();
+    final TextEditingController licenseController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: lightBackground,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: Text(
-                isLogin ? 'Login' : 'Sign Up',
-                style: TextStyle(color: darkBlue),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    if (!isLogin)
-                      TextField(
-                        controller: nameController,
-                        decoration: const InputDecoration(labelText: 'Full Name'),
-                      ),
-                    TextField(
-                      controller: emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                    ),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(labelText: 'Password'),
-                    ),
-                    if (!isLogin)
-                      DropdownButtonFormField<String>(
-                        value: selectedRole,
-                        decoration: const InputDecoration(labelText: 'Select Role'),
-                        items: roles
-                            .map((role) => DropdownMenuItem(
-                          value: role,
-                          child: Text(role),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedRole = value;
-                            });
-                          }
-                        },
-                      ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: orange,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      onPressed: () async {
-                        final email = emailController.text.trim();
-                        final password = passwordController.text;
-                        final fullName = nameController.text.trim();
-
-                        if (isLogin) {
-                          final user = fakeUsers.firstWhere(
-                                (u) => u['email'] == email && u['password'] == password,
-                            orElse: () => {},
-                          );
-                          if (user.isNotEmpty) {
-                            await _saveCurrentUser(user);
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Login successful!')),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invalid credentials')),
-                            );
-                          }
-                        } else {
-                          final exists = fakeUsers.any((u) => u['email'] == email);
-                          if (exists) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('User already exists!')),
-                            );
-                          } else {
-                            final newUser = {
-                              'name': fullName,
-                              'email': email,
-                              'password': password,
-                              'role': selectedRole,
-                            };
-                            fakeUsers.add(newUser);
-                            await _saveUsers();
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Sign Up successful! Please log in.')),
-                            );
-                          }
-                        }
-
-                        emailController.clear();
-                        passwordController.clear();
-                        nameController.clear();
-                      },
-                      child: Text(isLogin ? 'Login' : 'Sign Up'),
-                    ),
-                    const SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          isLogin = !isLogin;
-                        });
-                      },
-                      child: Text(
-                        isLogin
-                            ? "Don't have an account? Sign Up"
-                            : "Already have an account? Login",
-                        style: TextStyle(color: darkBlue),
-                      ),
-                    ),
-                  ],
+        return AlertDialog(
+          backgroundColor: Color(0xFFFAF9F0),
+          title: Text("Owner Application Form", style: TextStyle(fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(controller: nameController, decoration: InputDecoration(labelText: "Full Name")),
+                TextField(controller: phoneController, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: "Phone Number")),
+                TextField(controller: companyController, decoration: InputDecoration(labelText: "Company Name")),
+                TextField(controller: licenseController, decoration: InputDecoration(labelText: "License Number")),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFF5722)),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Application submitted successfully!")),
+                    );
+                  },
+                  child: Text("Submit"),
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         );
       },
     );
   }
 
-  void _goToDashboard() {
-    if (currentUser != null) {
-      final role = currentUser!['role'];
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Navigating to $role Dashboard...')),
-      );
-    }
-  }
+  Widget _buildSidebar() {
+    final bool isLoggedIn = currentUser != null;
+    final String? userRole = currentUser?['role'];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: lightBackground,
-      appBar: AppBar(
-        backgroundColor: darkBlue,
-        elevation: 4,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Color(0xFF121435)),
+            child: Row(
+              children: [
+                Icon(Icons.directions_bus, size: 30, color: Colors.white),
+                SizedBox(width: 10),
+                Text("ClassRide", style: TextStyle(fontSize: 24, color: Colors.white)),
+              ],
+            ),
           ),
-        ),
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'Class',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              TextSpan(
-                text: 'Ride',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: orange,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          if (currentUser != null)
-            TextButton.icon(
-              onPressed: _goToDashboard,
-              icon: const Icon(Icons.dashboard, color: Colors.white),
-              label: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+          ListTile(title: Text("About Us"), onTap: () {}),
+          if (isLoggedIn && userRole != null)
+            ListTile(
+              title: Text("Dashboard (${userRole.capitalize()})"),
+              onTap: () {
+                Navigator.pop(context);
+                Widget dashboard;
+                switch (userRole) {
+                  case 'student':
+                    dashboard = StudentDashboard();
+                    break;
+                  case 'driver':
+                    dashboard = DriverDashboard();
+                    break;
+                  case 'owner':
+                    dashboard = OwnerDashboard();
+                    break;
+                  default:
+                    dashboard = StudentDashboard();
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => dashboard),
+                );
+              },
             ),
-          TextButton.icon(
-            onPressed: () {
-              if (currentUser != null) {
-                _logout();
-              } else {
-                _showAuthDialog(context);
-              }
-            },
-            icon: Icon(
-              currentUser == null ? Icons.login : Icons.logout,
-              color: Colors.white,
-            ),
-            label: Text(
-              currentUser == null ? 'Sign Up / Login' : 'Logout',
-              style: const TextStyle(color: Colors.white),
-            ),
+          ListTile(
+            title: Text(isLoggedIn ? "Logout" : "Login / Sign Up"),
+            onTap: isLoggedIn ? _logout : _showAuthDialog,
           ),
         ],
       ),
-      drawer: Drawer(
-        backgroundColor: lightBackground,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: darkBlue),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.bus_alert, color: Colors.white, size: 40),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Welcome${currentUser != null ? ', ${currentUser!['name']}' : ''}!',
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ],
-              ),
-            ),
-            const ListTile(leading: Icon(Icons.home), title: Text('Home')),
-            const ListTile(leading: Icon(Icons.info), title: Text('About')),
-            const ListTile(leading: Icon(Icons.support), title: Text('Support')),
-          ],
+    );
+  }
+
+  Widget _buildWelcomeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Welcome to ClassRide",
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF121435))),
+        SizedBox(height: 10),
+        Text(
+          "ClassRide is a smart and easy-to-use platform designed to connect students, drivers, and bus owners. "
+              "It simplifies your daily commute to and from school by helping you manage your ride efficiently and safely.",
+          style: TextStyle(fontSize: 16),
         ),
-      ),
+        SizedBox(height: 15),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            'about.jpg',
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        ),
+        SizedBox(height: 30),
+      ],
+    );
+  }
 
-
-      body: SingleChildScrollView(
+  Widget _buildOwnerCard() {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            if (currentUser != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  "Welcome, ${currentUser!['name']}! You're logged in as a ${currentUser!['role']}.",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: darkBlue),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 300,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  PageView.builder(
-                    controller: _pageController,
-                    itemCount: slideTexts.length,
-                    onPageChanged: (index) {
-                      setState(() => _currentPage = index);
-                    },
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: Card(
-                          elevation: 6,
-                          color: beige,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Text(
-                                slideTexts[index],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: darkBlue,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  Positioned(
-                    left: 10,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
-                      onPressed: () {
-                        int prev = (_currentPage - 1 + slideTexts.length) % slideTexts.length;
-                        _pageController.animateToPage(
-                          prev,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    right: 10,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () {
-                        int next = (_currentPage + 1) % slideTexts.length;
-                        _pageController.animateToPage(
-                          next,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(slideTexts.length, (index) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 12 : 8,
-                  height: _currentPage == index ? 12 : 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index ? orange : Colors.grey,
-                    shape: BoxShape.circle,
-                  ),
-                );
-              }),
-            ),
-            const SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left text
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "About Us",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: darkBlue,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "ClassRide is a smart student bus management system that connects students, drivers, and bus owners in one platform. "
-                              "Our goal is to make university transportation more organized, secure, and efficient for everyone involved.",
-                          style: TextStyle(fontSize: 16, color: darkBlue),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  // Right image
-                  Expanded(
-                    flex: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        "https://cdn-icons-png.flaticon.com/512/1995/1995516.png",
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              color: beige,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: const Center(
-                child: Text(
-                  "© 2025 ClassRide. All rights reserved.",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-            ),
+            Text("Are you a bus owner?",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            Text("Apply to manage your business and trips using ClassRide."),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _showOwnerApplicationForm,
+              child: Text("Apply as Owner"),
+            )
           ],
         ),
       ),
     );
   }
+
+  Widget _buildFinderCard() {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Text("Are you a student or a driver?",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            Text("Use our chatbot to find a bus within your home location range to ride or drive."),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => setState(() => showChatConversation = true),
+              child: Text("Find a Bus"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatBot() {
+    if (!showChatConversation) return SizedBox.shrink();
+
+    return Container(
+      margin: EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: conversation.map((msg) {
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(msg['text']),
+                  if (msg['button'] != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: ElevatedButton(
+                        onPressed: _showOwnerApplicationForm,
+                        child: Text(msg['button']),
+                      ),
+                    )
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: _buildSidebar(),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF121435),
+        title: Row(
+          children: [
+            Icon(Icons.directions_bus, color: Colors.white),
+            SizedBox(width: 10),
+            Text("ClassRide", style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildWelcomeSection(),
+            _buildOwnerCard(),
+            _buildFinderCard(),
+            _buildChatBot(),
+          ],
+        ),
+      ),
+      backgroundColor: Color(0xFFFAF9F0),
+    );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() => "${this[0].toUpperCase()}${substring(1)}";
 }
