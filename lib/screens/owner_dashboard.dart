@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../widgets/trip_management.dart';
 class OwnerDashboard extends StatefulWidget {
   @override
   _OwnerDashboardState createState() => _OwnerDashboardState();
@@ -12,19 +12,33 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   List<String> destinations = ['Downtown', 'University District', 'City Center'];
   List<String> drivers = ['Ahmed Zaki', 'Fatima El-Sayed', 'Youssef Kamal'];
 
+  List<Map<String, dynamic>> students = [
+    {'name': 'Sarah Ali', 'phone': '01012345678', 'university': 'LIU', 'attended': false},
+    {'name': 'Hassan Omar', 'phone': '01122334455', 'university': 'IUL', 'attended': true},
+    {'name': 'Maya Tarek', 'phone': '01234567890', 'university': 'LIU', 'attended': false},
+  ];
+
   void _selectPage(String page) {
     setState(() {
       selectedPage = page;
     });
     Navigator.pop(context);
   }
+  List<Map<String, String>> trips = [];
+
+  List<Map<String, dynamic>> assignableStudents = [
+    {'name': 'Ali Kamel', 'phone': '01011112222', 'destination': 'City Center', 'assignedTrip': null},
+    {'name': 'Laila Nour', 'phone': '01122223333', 'destination': 'Downtown', 'assignedTrip': null},
+    {'name': 'Hussein Zaki', 'phone': '01233334444', 'destination': 'University District', 'assignedTrip': null},
+    {'name': 'Nour Fathy', 'phone': '01099998888', 'destination': 'City Center', 'assignedTrip': null},
+  ];
 
   void _showRequestsModal() {
     showDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
-          backgroundColor: Color(0xFFFAF9F0),
+          backgroundColor: Color(0xFFEFEFEF), // Light Gray
           title: Text("Join Requests", style: TextStyle(fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
@@ -42,7 +56,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 SizedBox(height: 24),
                 _buildRequestSection(
                   title: "Driver Requests",
-                  color: Colors.orange.shade100,
+                  color: Color(0xFFFFE0C2), // Soft orange background to match EF9651
                   requests: [
                     {'name': 'Mostafa Hassan', 'phone': '01234567891', 'license': 'LIC123456'},
                     {'name': 'Omar Tarek', 'phone': '01122334455', 'license': 'LIC654321'},
@@ -56,6 +70,43 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text("Close", style: TextStyle(color: Color(0xFF121435))),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddItemModal(String title, void Function(String) onAdd) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: Color(0xFFFAF9F0),
+          title: Text("Add $title", style: TextStyle(fontWeight: FontWeight.bold)),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: "Enter $title name",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String newItem = controller.text.trim();
+                if (newItem.isNotEmpty) {
+                  onAdd(newItem);
+                  Navigator.pop(context);
+                }
+              },
+              child: Text("Add"),
             ),
           ],
         );
@@ -130,10 +181,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     required Color color,
     Widget? trailing,
   }) {
-    return SizedBox(
-      width: 300,
+    return Expanded(
       child: Container(
         padding: EdgeInsets.all(16),
+        margin: EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(16),
@@ -169,6 +220,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     required VoidCallback onAdd,
     required void Function(String item) onRemove,
   }) {
+    final bool showAddButton = title != 'Drivers';
+
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 16),
@@ -189,11 +242,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 child: Text(title,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ),
-              IconButton(
-                icon: Icon(Icons.add_circle, color: Color(0xFF121435)),
-                tooltip: 'Add $title',
-                onPressed: onAdd,
-              ),
+              if (showAddButton)
+                IconButton(
+                  icon: Icon(Icons.add_circle, color: Color(0xFF121435)),
+                  tooltip: 'Add $title',
+                  onPressed: onAdd,
+                ),
             ],
           ),
           Divider(),
@@ -208,6 +262,67 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               ),
             );
           }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentTable() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.yellow.shade100,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Students", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowColor: MaterialStateProperty.all(Color(0xFF121435)),
+              headingTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              columnSpacing: 24,
+              columns: const [
+                DataColumn(label: Text('Name')),
+                DataColumn(label: Text('Phone')),
+                DataColumn(label: Text('University')),
+                DataColumn(label: Text('Attendance')),
+                DataColumn(label: Text('Actions')),
+              ],
+              rows: students.map((student) {
+                return DataRow(cells: [
+                  DataCell(Text(student['name'])),
+                  DataCell(Text(student['phone'])),
+                  DataCell(Text(student['university'])),
+                  DataCell(Switch(
+                    value: student['attended'],
+                    onChanged: (val) {
+                      setState(() {
+                        student['attended'] = val;
+                      });
+                    },
+                  )),
+                  DataCell(
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        setState(() {
+                          students.remove(student);
+                        });
+                      },
+                    ),
+                  ),
+                ]);
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -231,13 +346,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               ),
               SizedBox(height: 24),
 
-              Wrap(
-                spacing: 16,
-                runSpacing: 16,
+              Row(
                 children: [
                   _buildDashboardBox(
                     title: "Joined Students",
-                    count: 24,
+                    count: students.length,
                     icon: Icons.group,
                     color: Colors.green.shade100,
                   ),
@@ -249,7 +362,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     trailing: ElevatedButton(
                       onPressed: _showRequestsModal,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFFF5722),
+                        backgroundColor: Color(0xFFEC5228), // Red-Orange
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       ),
                       child: Text("View Requests", style: TextStyle(fontSize: 12)),
@@ -278,7 +391,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                               title: 'Buses',
                               color: Colors.blue.shade100,
                               items: buses,
-                              onAdd: () => setState(() => buses.add('New Bus')),
+                              onAdd: () => _showAddItemModal('Bus', (value) {
+                                setState(() => buses.add(value));
+                              }),
                               onRemove: (item) => setState(() => buses.remove(item)),
                             ),
                           ),
@@ -290,10 +405,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                               title: 'Destinations',
                               color: Colors.purple.shade100,
                               items: destinations,
-                              onAdd: () =>
-                                  setState(() => destinations.add('New Destination')),
-                              onRemove: (item) =>
-                                  setState(() => destinations.remove(item)),
+                              onAdd: () => _showAddItemModal('Destination', (value) {
+                                setState(() => destinations.add(value));
+                              }),
+                              onRemove: (item) => setState(() => destinations.remove(item)),
                             ),
                           ),
                         ],
@@ -303,9 +418,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         title: 'Drivers',
                         color: Colors.teal.shade100,
                         items: drivers,
-                        onAdd: () => setState(() => drivers.add('New Driver')),
+                        onAdd: () {}, // Disabled
                         onRemove: (item) => setState(() => drivers.remove(item)),
                       ),
+                      SizedBox(height: 16),
+                      _buildStudentTable(),
                     ],
                   );
                 },
@@ -315,6 +432,20 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         ),
       );
     }
+
+    if (selectedPage == 'manage_trips') {
+      return TripManagement(
+        buses: buses,
+        destinations: destinations,
+        drivers: drivers,
+        trips: trips,
+        assignableStudents: assignableStudents,
+        onTripCreated: (trip) => setState(() => trips.add(trip)),
+        onTripRemoved: (trip) => setState(() => trips.remove(trip)),
+        onStudentAssigned: (student, trip) => setState(() => student['assignedTrip'] = trip),
+      );
+    }
+
 
     return Center(child: Text("Page not implemented yet"));
   }
@@ -332,7 +463,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     return Scaffold(
       backgroundColor: Color(0xFFFAF9F0),
       appBar: AppBar(
-        backgroundColor: Color(0xFF121435),
+        backgroundColor: Color(0xFF3F7D58), // Primary Green
         title: Text("Owner Dashboard"),
         foregroundColor: Colors.white,
       ),
@@ -377,4 +508,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       ),
     );
   }
+
+
+
+
 }
+
+

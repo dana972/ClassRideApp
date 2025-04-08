@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/client.dart';
-
 void main() {
   runApp(ClassRideApp());
 }
-
 class ClassRideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
