@@ -159,10 +159,10 @@ class _ClientPageState extends State<ClientPage> {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Color(0xFF3F7D58)),
+            decoration: BoxDecoration(color: Color(0xFF121435)),
             child: Row(
               children: [
-                Icon(Icons.directions_bus, size: 30, color: Colors.white),
+                Icon(Icons.directions_bus, size: 30, color: Color(0xFFFF6500)),
                 SizedBox(width: 10),
                 Text("ClassRide", style: TextStyle(fontSize: 24, color: Colors.white)),
               ],
@@ -235,7 +235,7 @@ class _ClientPageState extends State<ClientPage> {
 
   Widget _buildOwnerCard() {
     return Card(
-      color: Color(0xFFEF9651),
+      color: Color(0xFFFF6500),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -248,7 +248,7 @@ class _ClientPageState extends State<ClientPage> {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: _showOwnerApplicationForm,
-              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF3F7D58)),
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
               child: Text("Apply as Owner"),
             )
           ],
@@ -259,7 +259,7 @@ class _ClientPageState extends State<ClientPage> {
 
   Widget _buildFinderCard() {
     return Card(
-      color: Color(0xFFFFF3E0),
+      color: Color(0xFFFF6500),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -272,7 +272,7 @@ class _ClientPageState extends State<ClientPage> {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () => setState(() => showChatConversation = true),
-              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF3F7D58)),
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
               child: Text("Find a Bus"),
             )
           ],
@@ -300,7 +300,7 @@ class _ClientPageState extends State<ClientPage> {
               margin: EdgeInsets.symmetric(vertical: 8),
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Color(0xFFEF9651),
+                color: Color(0xFFFF6500),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -312,7 +312,7 @@ class _ClientPageState extends State<ClientPage> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: ElevatedButton(
                         onPressed: _showOwnerApplicationForm,
-                        style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF3F7D58)),
+                        style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
                         child: Text(msg['button']!),
                       ),
                     )
@@ -339,10 +339,10 @@ class _ClientPageState extends State<ClientPage> {
       backgroundColor: Color(0xFFFAF9F0),
       drawer: _buildSidebar(),
       appBar: AppBar(
-        backgroundColor: Color(0xFF3F7D58),
+        backgroundColor: Color(0xFF121435),
         title: Row(
           children: [
-            Icon(Icons.directions_bus, color: Colors.white),
+            Icon(Icons.directions_bus, color: Color(0xFFFF6500)),
             SizedBox(width: 10),
             Text("ClassRide", style: TextStyle(color: Colors.white)),
           ],

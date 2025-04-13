@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ProfileManagement extends StatefulWidget {
+class StudentProfileManagement extends StatefulWidget {
   @override
-  _ProfileManagementState createState() => _ProfileManagementState();
+  _StudentProfileManagementState createState() => _StudentProfileManagementState();
 }
 
-class _ProfileManagementState extends State<ProfileManagement> {
-  final TextEditingController _nameController = TextEditingController(text: "Bus Owner");
-  final TextEditingController _phoneController = TextEditingController(text: "01012345678");
+class _StudentProfileManagementState extends State<StudentProfileManagement> {
+  final TextEditingController _nameController = TextEditingController(text: "Student Name");
+  final TextEditingController _phoneController = TextEditingController(text: "01098765432");
+  final TextEditingController _universityController = TextEditingController(text: "LIU");
 
   bool _isEditing = false;
 
@@ -44,11 +45,13 @@ class _ProfileManagementState extends State<ProfileManagement> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Profile Management", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text("Student Profile", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           SizedBox(height: 24),
           _buildTextField("Full Name", _nameController, _isEditing),
           SizedBox(height: 16),
           _buildTextField("Phone Number", _phoneController, _isEditing),
+          SizedBox(height: 16),
+          _buildTextField("University", _universityController, _isEditing),
           SizedBox(height: 24),
           Row(
             children: [

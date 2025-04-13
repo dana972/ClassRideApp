@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/trip_management.dart';
-import '../widgets/trip_history.dart'; // adjust path if needed
+import '../widgets/trip_history.dart';
 import '../widgets/chats.dart';
-import '../widgets/profile_management.dart';
+import '../widgets/owner_profile_management.dart';
 import '../widgets/payments_management.dart';
 class OwnerDashboard extends StatefulWidget {
   @override
@@ -60,7 +60,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 SizedBox(height: 24),
                 _buildRequestSection(
                   title: "Driver Requests",
-                  color: Color(0xFFFFE0C2), // Soft orange background to match EF9651
+                  color: Color(0xFFFFE0C2), // Soft orange background
                   requests: [
                     {'name': 'Mostafa Hassan', 'phone': '01234567891', 'license': 'LIC123456'},
                     {'name': 'Omar Tarek', 'phone': '01122334455', 'license': 'LIC654321'},
@@ -315,7 +315,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   )),
                   DataCell(
                     IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.delete, color: Color(0xFFFF5722)),
                       onPressed: () {
                         setState(() {
                           students.remove(student);
@@ -340,6 +340,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 16),
+              ProfileManagement(),
+              SizedBox(height: 24),
+
               Text(
                 "Welcome, Bus Owner!",
                 style: TextStyle(
@@ -420,7 +424,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       SizedBox(height: 16),
                       _buildListBox(
                         title: 'Drivers',
-                        color: Colors.teal.shade100,
+                        color: Color(0xFFEDEBCA),
                         items: drivers,
                         onAdd: () {}, // Disabled
                         onRemove: (item) => setState(() => drivers.remove(item)),
@@ -435,6 +439,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           ),
         ),
       );
+
     }
 
     if (selectedPage == 'manage_trips') {
@@ -452,14 +457,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
 
 
     if (selectedPage == 'trip_history') {
-      return TripHistory(); // Assuming you imported it correctly
+      return TripHistory();
     }
     if (selectedPage == 'chats') {
       return ChatsPage();
     }
-    if (selectedPage == 'profile') {
-      return ProfileManagement();
-    }
+
     if (selectedPage == 'manage_payments') {
       return PaymentsManagement();
     }
@@ -479,7 +482,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     return Scaffold(
       backgroundColor: Color(0xFFFAF9F0),
       appBar: AppBar(
-        backgroundColor: Color(0xFF3F7D58), // Primary Green
+        backgroundColor: Color(0xFF121435), // Primary Green
         title: Text("Owner Dashboard"),
         foregroundColor: Colors.white,
       ),
@@ -504,10 +507,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             ),
             _buildDrawerItem(Icons.dashboard, 'Dashboard', () => _selectPage('dashboard')),
             _buildDrawerItem(Icons.manage_search, 'Manage Trips', () => _selectPage('manage_trips')),
-            _buildDrawerItem(Icons.manage_search, 'Manage Payments', () => _selectPage('manage_payments')),
+            _buildDrawerItem(Icons.money, 'Manage Payments', () => _selectPage('manage_payments')),
             _buildDrawerItem(Icons.history, 'Trip History', () => _selectPage('trip_history')),
             _buildDrawerItem(Icons.chat, 'Chats', () => _selectPage('chats')),
-            _buildDrawerItem(Icons.person, 'Manage Profile', () => _selectPage('profile')),
             _buildDrawerItem(Icons.home, 'Back to Home', () {
               Navigator.popUntil(context, (route) => route.isFirst);
             }),
