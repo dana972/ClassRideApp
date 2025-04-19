@@ -41,9 +41,9 @@ class StudentAssignedTrips extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.green.shade50,
+            color: Colors.orange.shade50,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Color(0xFF3F7D58)),
+            border: Border.all(color: Color(0xFFFF6500)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +90,7 @@ class StudentAssignedTrips extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
           child: ListTile(
-            leading: Icon(Icons.directions_bus, color: Color(0xFF3F7D58)),
+            leading: Icon(Icons.directions_bus, color: Color(0xFFFF6500)),
             title: Text(trip['name'] ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

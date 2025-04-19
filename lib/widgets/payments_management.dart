@@ -67,13 +67,17 @@ class _PaymentsManagementState extends State<PaymentsManagement> {
                       Text("Date: ${student['date']}"),
                     ],
                   ),
-                  trailing: ElevatedButton(
+                  trailing:ElevatedButton(
                     onPressed: () => _togglePaymentStatus(index),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: student['paid'] ? Colors.green : Colors.orange,
+                      backgroundColor: student['paid'] ? Color(0xFF121435) : Colors.orange,
                     ),
-                    child: Text(student['paid'] ? 'Paid' : 'Confirm'),
+                    child: Text(
+                      student['paid'] ? 'Paid' : 'Confirm',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
+
                 ),
               );
             },
@@ -84,7 +88,7 @@ class _PaymentsManagementState extends State<PaymentsManagement> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: _saveConfirmedPayments,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
               child: Text("Save Confirmed Payments"),
             ),
           ),

@@ -56,7 +56,7 @@ class ChatsPage extends StatelessWidget {
                         margin: EdgeInsets.symmetric(vertical: 4),
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: msg['fromMe'] ? Colors.teal.shade100 : Colors.grey.shade200,
+                          color: msg['fromMe'] ? Color(0xFFFFE0B2) : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(msg['text']),
@@ -78,7 +78,7 @@ class ChatsPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Close"),
+            child: Text("Close", style: TextStyle(color: Color(0xFF121435))),
           ),
         ],
       ),
@@ -94,8 +94,8 @@ class ChatsPage extends StatelessWidget {
         final convo = conversations[index];
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: Colors.teal,
-            child: Text(convo['name']![0]),
+            backgroundColor: Color(0xFFFF6500),
+            child: Text(convo['name']![0], style: TextStyle(color: Colors.white)),
           ),
           title: Text(convo['name']),
           subtitle: Text(convo['lastMessage']),

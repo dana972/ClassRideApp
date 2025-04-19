@@ -28,7 +28,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     });
     Navigator.pop(context);
   }
-  List<Map<String, String>> trips = [];
+  List<Map<String, dynamic>> trips = [];
 
   List<Map<String, dynamic>> assignableStudents = [
     {'name': 'Ali Kamel', 'phone': '01011112222', 'destination': 'City Center', 'assignedTrip': null},
@@ -128,8 +128,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: color,
+        color: Colors.yellow.shade100,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       padding: EdgeInsets.all(12),
       margin: EdgeInsets.only(bottom: 16),
@@ -163,7 +166,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                           onPressed: () {},
                         ),
                         IconButton(
-                          icon: Icon(Icons.cancel, color: Colors.red),
+                          icon: Icon(Icons.cancel, color: Colors.orange),
                           onPressed: () {},
                         ),
                       ],
@@ -190,23 +193,23 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         padding: EdgeInsets.all(16),
         margin: EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(16),
+            color: Color(0xFF3F7D58), // Primary Green
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 32, color: Color(0xFF121435)),
+            Icon(icon, size: 32,color: Colors.white),
             SizedBox(height: 10),
             Text(
               "$count",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             SizedBox(height: 4),
-            Text(title, style: TextStyle(fontSize: 16)),
+            Text(title, style: TextStyle(fontSize: 16, color: Colors.white)),
             if (trailing != null) ...[
               SizedBox(height: 12),
               trailing,
@@ -231,7 +234,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       margin: EdgeInsets.only(bottom: 16),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color,
+        color: Colors.yellow.shade100,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
@@ -261,7 +264,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               contentPadding: EdgeInsets.symmetric(horizontal: 0),
               title: Text(item),
               trailing: IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
+                icon: Icon(Icons.delete, color: Colors.orange),
                 onPressed: () => onRemove(item),
               ),
             );
@@ -311,11 +314,14 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       setState(() {
                         student['attended'] = val;
                       });
-                    },
+                    }, activeColor: Colors.white ,           // Dark green thumb
+                    activeTrackColor: Colors.green ,      // Softer dark green track
+                    inactiveThumbColor: Colors.white,         // Thumb when OFF
+                    inactiveTrackColor: Colors.grey.shade400,
                   )),
                   DataCell(
                     IconButton(
-                      icon: Icon(Icons.delete, color: Color(0xFFFF5722)),
+                      icon: Icon(Icons.delete, color: Colors.orange),
                       onPressed: () {
                         setState(() {
                           students.remove(student);
@@ -370,7 +376,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     trailing: ElevatedButton(
                       onPressed: _showRequestsModal,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFEC5228), // Red-Orange
+                        backgroundColor: Colors.orange,
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       ),
                       child: Text("View Requests", style: TextStyle(fontSize: 12)),
@@ -451,7 +457,19 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         assignableStudents: assignableStudents,
         onTripCreated: (trip) => setState(() => trips.add(trip)),
         onTripRemoved: (trip) => setState(() => trips.remove(trip)),
-        onStudentAssigned: (student, trip) => setState(() => student['assignedTrip'] = trip),
+        onStudentAssigned: (student, trip) {
+          setState(() {
+            student['assignedTrip'] = trip;
+            trip['students'] ??= [];
+            trip['students'].add(student);
+          });
+        },
+        onStudentRemoved: (student, trip) {
+          setState(() {
+            trip['students']?.removeWhere((s) => s['name'] == student['name']);
+            student['assignedTrip'] = null;
+          });
+        },
       );
     }
 
@@ -482,7 +500,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     return Scaffold(
       backgroundColor: Color(0xFFFAF9F0),
       appBar: AppBar(
-        backgroundColor: Color(0xFF121435), // Primary Green
+        backgroundColor: Color(0xFF121435),
         title: Text("Owner Dashboard"),
         foregroundColor: Colors.white,
       ),

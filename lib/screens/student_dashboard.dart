@@ -19,8 +19,8 @@ class _AttendanceBoxState extends State<AttendanceBox> {
       width: 260,
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        border: Border.all(color: Color(0xFF3F7D58)),
+        color: Colors.orange.shade50,
+        border: Border.all(color: Colors.orange),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -34,7 +34,7 @@ class _AttendanceBoxState extends State<AttendanceBox> {
                 _attendingTomorrow = val;
               });
             },
-            activeColor: Color(0xFF3F7D58),
+            activeColor:Colors.orange,
           ),
           SizedBox(height: 8),
           Text("you want to change your fixed return time?:", style: TextStyle(fontWeight: FontWeight.w500)),
@@ -134,7 +134,7 @@ class _ProfileManagementState extends State<ProfileManagement> {
               if (_isEditing)
                 ElevatedButton(
                   onPressed: _saveProfile,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
                   child: Text("Save"),
                 ),
             ],
@@ -162,7 +162,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: Color(0xFF3F7D58)),
+      leading: Icon(icon, color: Color(0xFF121435)),
       title: Text(title),
       onTap: onTap,
     );
@@ -204,19 +204,29 @@ class _StudentDashboardState extends State<StudentDashboard> {
     return Scaffold(
       backgroundColor: Color(0xFFEFEFEF),
       appBar: AppBar(
-        backgroundColor: Color(0xFF3F7D58),
-        title: Text("Student Dashboard"),
+        leading: Builder(
+        builder: (context) => IconButton(
+      icon: Icon(Icons.menu, color: Colors.white),
+      onPressed: () => Scaffold.of(context).openDrawer(),),),
+        backgroundColor: Color(0xFF121435),
+        title: Text("Student Dashboard",style: TextStyle(color: Colors.white),),
       ),
       drawer: Drawer(
+        backgroundColor: Color(0xFFEDEBCA),
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF3F7D58)),
-              child: Center(
-                child: Text(
-                  "Student Menu",
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
+              decoration: BoxDecoration(color: Color(0xFF121435)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.directions_bus, size: 40, color: Colors.white),
+                  SizedBox(height: 8),
+                  Text('Student',
+                      style: TextStyle(
+                          color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('student@classride.com', style: TextStyle(color: Colors.white70)),
+                ],
               ),
             ),
             _buildDrawerItem(Icons.dashboard, 'Dashboard', () => _selectPage('dashboard')),

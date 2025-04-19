@@ -64,7 +64,7 @@ class _StudentProfileManagementState extends State<StudentProfileManagement> {
               if (_isEditing)
                 ElevatedButton(
                   onPressed: _saveProfile,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
                   child: Text("Save"),
                 ),
             ],

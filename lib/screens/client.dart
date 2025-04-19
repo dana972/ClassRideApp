@@ -149,6 +149,46 @@ class _ClientPageState extends State<ClientPage> {
       },
     );
   }
+  void _showContactModal() {
+    final TextEditingController messageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Color(0xFFEFEFEF),
+          title: Text("Contact Us", style: TextStyle(fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: messageController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    labelText: "Your Message",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Message sent! We'll get back to you soon.")),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFEC5228)),
+                  child: Text("Send"),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   Widget _buildSidebar() {
     final bool isLoggedIn = currentUser != null;
@@ -162,13 +202,21 @@ class _ClientPageState extends State<ClientPage> {
             decoration: BoxDecoration(color: Color(0xFF121435)),
             child: Row(
               children: [
-                Icon(Icons.directions_bus, size: 30, color: Color(0xFFFF6500)),
+                Icon(Icons.directions_bus, size: 40, color: Color(0xFFFF6500)),
                 SizedBox(width: 10),
                 Text("ClassRide", style: TextStyle(fontSize: 24, color: Colors.white)),
               ],
             ),
           ),
           ListTile(title: Text("About Us"), onTap: () {}),
+          ListTile(
+            title: Text("Contact Us"),
+            onTap: () {
+              Navigator.pop(context); // close the drawer
+              _showContactModal();
+            },
+          ),
+
           if (isLoggedIn && userRole != null)
             ListTile(
               title: Text("Dashboard (${userRole.capitalize()})"),
@@ -266,9 +314,9 @@ class _ClientPageState extends State<ClientPage> {
         child: Column(
           children: [
             Text("Are you a student or a driver?",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white)),
             SizedBox(height: 10),
-            Text("Use our chatbot to find a bus within your home location range to ride or drive."),
+            Text("Use our chatbot to find a bus within your home location range to ride or drive.",style:TextStyle(color: Colors.white)),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () => setState(() => showChatConversation = true),
@@ -342,9 +390,9 @@ class _ClientPageState extends State<ClientPage> {
         backgroundColor: Color(0xFF121435),
         title: Row(
           children: [
-            Icon(Icons.directions_bus, color: Color(0xFFFF6500)),
+            Icon(Icons.directions_bus,size: 40, color: Color(0xFFFF6500)),
             SizedBox(width: 10),
-            Text("ClassRide", style: TextStyle(color: Colors.white)),
+            Text("ClassRide", style: TextStyle(fontSize: 24,color: Colors.white)),
           ],
         ),
         iconTheme: IconThemeData(color: Colors.white),

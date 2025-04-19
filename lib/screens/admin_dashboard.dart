@@ -45,12 +45,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  late ScrollController _horizontalScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _horizontalScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _horizontalScrollController.dispose();
+    super.dispose();
+  }
+
   Widget _buildUserTable() {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: Color(0xFF121435).withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
       ),
@@ -59,40 +73,47 @@ class _AdminDashboardState extends State<AdminDashboard> {
         children: [
           Text("Users", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(Color(0xFF121435)),
-              headingTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              columns: const [
-                DataColumn(label: Text('Name')),
-                DataColumn(label: Text('Phone')),
-                DataColumn(label: Text('Role')),
-                DataColumn(label: Text('Actions')),
-              ],
-              rows: users.map((user) {
-                return DataRow(cells: [
-                  DataCell(Text(user['name']!)),
-                  DataCell(Text(user['phone']!)),
-                  DataCell(Text(user['role']!)),
-                  DataCell(
-                    IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        setState(() {
-                          users.remove(user);
-                        });
-                      },
+          Scrollbar(
+            controller: _horizontalScrollController,
+            thumbVisibility: true,
+            trackVisibility: true,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: _horizontalScrollController,
+              child: DataTable(
+                headingRowColor: MaterialStateProperty.all(Color(0xFF121435)),
+                headingTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                columns: const [
+                  DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('Phone')),
+                  DataColumn(label: Text('Role')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: users.map((user) {
+                  return DataRow(cells: [
+                    DataCell(Text(user['name']!)),
+                    DataCell(Text(user['phone']!)),
+                    DataCell(Text(user['role']!)),
+                    DataCell(
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.orange),
+                        onPressed: () {
+                          setState(() {
+                            users.remove(user);
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ]);
-              }).toList(),
+                  ]);
+                }).toList(),
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildOwnerRequests() {
     return Column(
@@ -130,7 +151,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ownerRequests.remove(req);
                       });
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF121435)),
                     child: Text("Accept"),
                   ),
                   SizedBox(width: 10),
@@ -140,7 +161,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ownerRequests.remove(req);
                       });
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
                     child: Text("Reject"),
                   ),
                 ],
@@ -180,7 +201,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
       backgroundColor: Color(0xFFFAF9F0),
       appBar: AppBar(
-        backgroundColor: Color(0xFF3F7D58),
+        backgroundColor: Color(0xFF121435),
         title: Text("Admin Dashboard"),
         foregroundColor: Colors.white,
       ),

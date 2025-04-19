@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ProfileManagement extends StatefulWidget {
+class DriverProfileManagement extends StatefulWidget {
   @override
-  _ProfileManagementState createState() => _ProfileManagementState();
+  _DriverProfileManagementState createState() => _DriverProfileManagementState();
 }
 
-class _ProfileManagementState extends State<ProfileManagement> {
-  final TextEditingController _nameController = TextEditingController(text: "Bus Owner");
-  final TextEditingController _phoneController = TextEditingController(text: "01012345678");
+class _DriverProfileManagementState extends State<DriverProfileManagement> {
+  final TextEditingController _nameController = TextEditingController(text: "Driver Name");
+  final TextEditingController _phoneController = TextEditingController(text: "01098765432");
+  final TextEditingController _scheduleController = TextEditingController(text: "6:00 AM - 3:00 PM");
 
   bool _showForm = false;
   bool _isEditing = false;
@@ -15,7 +16,7 @@ class _ProfileManagementState extends State<ProfileManagement> {
   void _toggleFormVisibility() {
     setState(() {
       _showForm = !_showForm;
-      _isEditing = false; // reset edit mode when toggling
+      _isEditing = false;
     });
   }
 
@@ -30,7 +31,7 @@ class _ProfileManagementState extends State<ProfileManagement> {
       _isEditing = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Profile updated successfully!")),
+      SnackBar(content: Text("Driver profile updated successfully!")),
     );
   }
 
@@ -52,8 +53,8 @@ class _ProfileManagementState extends State<ProfileManagement> {
       children: [
         ElevatedButton.icon(
           onPressed: _toggleFormVisibility,
-          icon: Icon(_showForm ? Icons.keyboard_arrow_up : Icons.edit),
-          label: Text(_showForm ? "Hide Profile Form" : "Edit Profile"),
+          icon: Icon(_showForm ? Icons.keyboard_arrow_up : Icons.person),
+          label: Text(_showForm ? "Hide Driver Profile" : "Show Driver Profile"),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.orange,
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -71,11 +72,13 @@ class _ProfileManagementState extends State<ProfileManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Profile Information", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text("Driver Information", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 SizedBox(height: 24),
                 _buildTextField("Full Name", _nameController, _isEditing),
                 SizedBox(height: 16),
                 _buildTextField("Phone Number", _phoneController, _isEditing),
+                SizedBox(height: 16),
+                _buildTextField("Available Schedule", _scheduleController, _isEditing),
                 SizedBox(height: 24),
                 Row(
                   children: [

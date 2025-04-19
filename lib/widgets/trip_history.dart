@@ -53,7 +53,7 @@ class TripHistory extends StatelessWidget {
               return ListTile(
                 leading: Icon(
                   student['payment'] ? Icons.check_circle : Icons.cancel,
-                  color: student['payment'] ? Colors.green : Colors.red,
+                  color: student['payment'] ? Colors.green : Colors.orange,
                 ),
                 title: Text(student['name']),
                 subtitle: Text(student['payment'] ? 'Payment Received' : 'Payment Pending'),
